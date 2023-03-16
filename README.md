@@ -39,7 +39,7 @@ Using this function, Map files could be stored as `json` files and dynamically c
 
 ## Tasks
  - [ ] `MAP_ARRAY` - Need functionality to beable to create an array of dictionaries if needed.
- ex: If I need to map to an array of objects, I should define the Array with a single object that contains the mapping, the object should contain a target key that identifies which value in the value dicts to iterate through [Issue-1](#1)
+ ex: If I need to map to an array of objects, I should define the Array with a single object that contains the mapping, the object should contain a target key that identifies which value in the value dicts to iterate through [Issue-1](/issues/1)
 
 
 ## Usage
