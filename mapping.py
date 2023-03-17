@@ -38,99 +38,98 @@ def _get_static_string(value_targets):
     """
     Return the static string in Value
     """
-    LOGGER.debug(f'Mapping Static String: {value_targets}')
+    LOGGER.debug('Mapping Static String: %s', value_targets)
     if len(value_targets) > 1:
-        try:
-            mapped_value = str(value_targets[1])
-            return mapped_value
+        mapped_value = str(value_targets[1])
+        return mapped_value
 
-        except ValueError:
-            # Check if Statement has an OR clause
-            LOGGER.error(f'Error converting value: {value_targets[1]} to string')
-            raise Exception(f"Error converting value: {value_targets[1]} to string")
+    raise ValueError(f"Error converting value: {value_targets[1]} to string")
 
-    raise Exception(f"Error converting value: {value_targets[1]} to string")
-
-def _get_static_int(value_targets, **value_dicts):
+def _get_static_int(value_targets, **_value_dicts):
     """
     Takes in the value map and returns a static Integer
     """
-    LOGGER.debug(f'Mapping Static Integer: {value_targets}')
+    LOGGER.debug('Mapping Static Integer: %s', value_targets)
     if len(value_targets) > 1:
         try:
             mapped_value = int(value_targets[1])
             return mapped_value
 
-        except ValueError:
+        except ValueError as exc:
             # Check if Statement has an OR clause
             if len(value_targets) > 3:
                 if 'OR' in value_targets:
-                    LOGGER.warning(f'Failed to Map Integer: {value_targets[1]}, using OR clause: {value_targets[value_targets.index("OR")+1:]}')
-                    return _get_mapped_value(".".join(value_targets[value_targets.index('OR')+1:]), **value_dicts)
-            LOGGER.error(f'Error converting value: {value_targets[1]} to integer')
-            raise Exception(f"Error converting value: {value_targets[1]} to integer")
+                    new_target = ".".join(value_targets[value_targets.index('OR')+1:])
+                    LOGGER.warning('Failed to Map Integer: %s, using OR clause: %s',
+                                   value_targets[1],
+                                   new_target)
 
-    raise Exception(f"Error converting value: {value_targets[1]} to integer")
+                    return _get_mapped_value(new_target, **_value_dicts)
 
-def _get_static_float(value_targets, **value_dicts):
+            LOGGER.error('Error converting value: %s to integer', value_targets[1])
+            raise ValueError(f"Error converting value: {value_targets[1]} to integer") from exc
+
+    raise RuntimeError(f"Error converting value: {value_targets[1]} to integer")
+
+def _get_static_float(value_targets, **_value_dicts):
     """
     Takes in the value map and returns a static Float value
     """
-    LOGGER.debug(f'Mapping Static Float: {value_targets}')
+    LOGGER.debug('Mapping Static Float: %s', value_targets)
     try:
         if len(value_targets) > 1:
-            
             if value_targets[1].isdigit():
-                
                 if len(value_targets) >= 3:
 
                     if value_targets[2].isdigit():
 
                         mapped_value = float(f'{value_targets[1]}.{value_targets[2]}')
-                        return mapped_value  
+                        return mapped_value
                 mapped_value = float(value_targets[1])
                 return mapped_value
-            else:
-                raise ValueError
-                        
-    except ValueError:
+
+        raise ValueError(f"Error converting value: {value_targets[1]} to float")
+    except ValueError as exc:
         if len(value_targets) >= 3:
             if 'OR' in value_targets:
-                LOGGER.warning(f'Failed to Map Float: {value_targets[1]}, using OR clause: {value_targets[value_targets.index("OR")+1:]}')
-                return _get_mapped_value(".".join(value_targets[value_targets.index('OR')+1:]), **value_dicts)
-        LOGGER.error(f'Error converting value: {value_targets[1]} to float')
-        raise Exception(f"Error converting value: {value_targets[1]} to float")
-            
+                new_target = ".".join(value_targets[value_targets.index('OR')+1:])
+                LOGGER.warning('Failed to Map Float: %s, using OR clause: %s',
+                               value_targets[1],
+                               new_target)
+                return _get_mapped_value(new_target, **_value_dicts)
+        LOGGER.error('Error converting value: %s to float', value_targets[1])
+        raise ValueError(f"Error converting value: {value_targets[1]} to float") from exc
 
-def _get_static_list(value_targets, **value_dicts):
+
+def _get_static_list(value_targets):
     """
     Takes in the value_targets and returns a list
     """
-    LOGGER.debug(f'Mapping Static List: {value_targets}')
+    LOGGER.debug('Mapping Static List: %s', value_targets)
     if len(value_targets) > 1:
         try:
             value_targets[1] = value_targets[1].replace(', ', ',')
             value_targets[1] = value_targets[1].replace(' ,', ',')
             mapped_value = value_targets[1].split(',')
             return mapped_value
-        except Exception as e:
-            LOGGER.error(f'Error converting value: {value_targets[1]} to list')
-            raise Exception(f"Error converting value: {value_targets[1]} to list")
+        except Exception as exc:
+            LOGGER.error('Error converting value: %s to list', value_targets[1])
+            raise RuntimeError(f"Error converting value: {value_targets[1]} to list") from exc
 
     return []
-    
 
-def _get_static_bool(value_targets, **value_dicts):
+
+def _get_static_bool(value_targets):
     """
     Get Value_target and return a boolean
     """
-    LOGGER.debug(f'Mapping Static Boolean: {value_targets}')
+    LOGGER.debug('Mapping Static Boolean: %s', value_targets)
     if value_targets[1] in ['True', 'true', 'TRUE']:
         return True
-    elif value_targets[1] in ['False', 'false', 'FALSE']:
+    if value_targets[1] in ['False', 'false', 'FALSE']:
         return False
-    LOGGER.error(f'Error converting value: {value_targets[1]} to boolean')
-    raise Exception(f"Error converting value: {value_targets[1]} to boolean")
+    LOGGER.error('Error converting value: %s to boolean', value_targets[1])
+    raise RuntimeError(f"Error converting value: {value_targets[1]} to boolean")
 
 
 # Dictionary defining reserved keywords and the function to call for each keyword
@@ -143,33 +142,33 @@ RESERVED_KEYWORDS = {
 }
 
 
-def map_dictionary( map, **value_dicts,): 
+def map_dictionary(map_dict, **value_dicts):
     """
-    Loop through the map dictionary and build a new dictionary from the values found in the value dictionaries.
+    Loop through the map dictionary and build a new dictionary from the values found 
+    in the value dictionaries.
     """
 
-    LOGGER.info(f'Beginning Mapping of Dictionary')
-    LOGGER.debug(f'Map: {json.dumps(map)}')
-    LOGGER.debug(f'Value Dictionaries: {json.dumps(value_dicts)}')
+    LOGGER.info('Beginning Mapping of Dictionary')
+    LOGGER.debug('Map: %s', json.dumps(map))
+    LOGGER.debug('Value Dictionaries: %s', json.dumps(value_dicts))
     # Initialize the mapped dictionary
     mapped_dict = {}
     # Validate each key in the map dictionary and route to the appropriate function
-    for key, value in map.items():
+    for key, value in map_dict.items():
         # If the value is SKIP, skip that key
-        LOGGER.debug(f'Mapping Key: {key} to value: {value}')
+        LOGGER.debug('Mapping Key: %s to value: %s', key, value)
         if value == 'SKIP':
-            LOGGER.debug(f'Skipping Key: {key}')
-            continue 
-        
+            LOGGER.debug('Skipping Key: %s', key)
+            continue
+
         # If the value is a dictionary, pass the dictionary back to map_dictionary function
         # With the current value_dicts
-        if type(value) is dict:
-            LOGGER.info(f'Value is a dictionary, mapping dictionary to Key: {key}')
+        if value.isinstance(dict):
+            LOGGER.info('Value is a dictionary, mapping dictionary to Key: %s', key)
             mapped_dict[key] = map_dictionary(value, **value_dicts)
         # Get the mapped value for the key
         else:
             mapped_dict[key] = _get_mapped_value(value, **value_dicts)
-        
     return mapped_dict
 
 
@@ -177,27 +176,28 @@ def _get_mapped_value(map_address, **value_dicts):
     """
     Takes in a map address and returns the value from the value dictionaries or static definition
     """
-    LOGGER.debug(f'Getting Mapped Value for: {map_address}')
+    LOGGER.debug('Getting Mapped Value for: %s', map_address)
     # Split map_address into value keys
     value_keys = map_address.split('.')
     # Check if the first key is `NULL` and return None if it is
     if value_keys[0] == 'NULL':
-        LOGGER.debug(f'Value is NULL, returning None')
+        LOGGER.debug('Value is NULL, returning None')
         return None
     # Check if the first key is a reserved keyword
-    if value_keys[0] in RESERVED_KEYWORDS.keys():
+    if value_keys[0] in RESERVED_KEYWORDS:
         try:
             # Call the reserved keyword function and return the result
-            # Note Recursion and recalculation of value_keys is handled in the reserved keyword functions
+            # Note Recursion and recalculation of value_keys is handled
+            # in the reserved keyword functions
             result = RESERVED_KEYWORDS[value_keys[0]](value_keys)
             return result
-        except Exception as e:
+        except Exception as exc:
             # If the reserved keyword function fails, raise an exception
-            raise Exception(f'Error getting mapped value: {e}')
+            raise RuntimeError(f'Error getting mapped value: {map_address}') from exc
     else:
         # If the first key is not a reserved keyword, get the value for the map address
         return _get_value_from_value_dict(map_address, **value_dicts)
-    
+
 
 def _get_value_from_value_dict(map_address, **value_dicts):
     """
@@ -206,62 +206,27 @@ def _get_value_from_value_dict(map_address, **value_dicts):
     """
     # Split map_address into key_groups separated by OR keyword
     key_groups = map_address.split('.OR.')
-        
-    try: 
+
+    try:
         #Split Address from first key_group
         address = key_groups[0].split('.')
         # Get the first value from the value dictionaries
         result = value_dicts[address[0]]
         # Loop through the rest of the address keys and return the value in result
         for address_key in address[1:]:
-            LOGGER.debug(f'Getting Value for Key: {address_key}')
+            LOGGER.debug('Getting Value for Key: %s', address_key)
             result = result[address_key]
         # If a result was found, return it
         return result
-    except KeyError:
+    except KeyError as exc:
         # If the first key_group failed, check if there are more key_groups
         if len(key_groups) > 1:
-            LOGGER.warning(f'Error getting value from value dictionary: {key_groups[0]} Using Value from OR: {".OR.".join(key_groups[1:])}')
+            new_target = '.OR.'.join(key_groups[1:])
+            LOGGER.warning('Error getting value from value dictionary: %s Using Value from OR: %s',
+                           key_groups[0],
+                           new_target)
             # Rejoin the rest of the key_groups and send string back to _get_mapped_value
-            return _get_mapped_value('.OR.'.join(key_groups[1:]), **value_dicts)
+            return _get_mapped_value(new_target, **value_dicts)
         # If no more key_groups exist, raise an exception
-        LOGGER.error(f'Failed to map value from value dictionary: {map_address}')
-        raise Exception(f'Error getting value from value dictionary: {map_address}')
-
-
-# Script to test the functions
-test_map = {
-    'id1': 'STRING.1234',
-    'id2': 'INT.123',
-    'id3': 'INT.test.OR.INT.cat.OR.INT.12',
-    'id4': 'FLOAT.12',
-    'id5': 'BOOL.True',
-    'id99': 'BOOL.False',
-    'id6': {
-        'id6.id7': 'STRING.This is a string',
-        'id6.id8': 'NULL'
-    },
-    'nested_values': {
-        'id9': 'STRING.this is the first layer',
-        'id10': {
-            'id11': 'STRING.This is the second layer',
-            'id12': {
-                'id13': 'STRING.This is the third layer'
-            }
-        }
-    },
-    'from_value_map': 'value_dict_1.id1',
-    'from_nested_map': 'value_dict_1.id2.id3',
-    'dict_from_nested_map': 'value_dict_1.id4.OR.STRING.This Failed'
-}
-
-value_dicts = {
-    'value_dict_1': {
-        'id1': '1234',
-        'id2': {
-            'id3': 'test'
-        }
-    }
-}
-
-print(json.dumps(map_dictionary(test_map, **value_dicts), indent=4))
+        LOGGER.error('Failed to map value from value dictionary: %s', map_address)
+        raise KeyError(f'Error getting value from value dictionary: {map_address}') from exc
