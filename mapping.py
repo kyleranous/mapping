@@ -45,7 +45,7 @@ def _get_static_string(value_targets):
 
     raise ValueError(f"Error converting value: {value_targets[1]} to string")
 
-def _get_static_int(value_targets, **_value_dicts):
+def _get_static_int(value_targets, **value_dicts):
     """
     Takes in the value map and returns a static Integer
     """
@@ -64,14 +64,14 @@ def _get_static_int(value_targets, **_value_dicts):
                                    value_targets[1],
                                    new_target)
 
-                    return _get_mapped_value(new_target, **_value_dicts)
+                    return _get_mapped_value(new_target, **value_dicts)
 
             LOGGER.error('Error converting value: %s to integer', value_targets[1])
             raise ValueError(f"Error converting value: {value_targets[1]} to integer") from exc
 
     raise RuntimeError(f"Error converting value: {value_targets[1]} to integer")
 
-def _get_static_float(value_targets, **_value_dicts):
+def _get_static_float(value_targets, **value_dicts):
     """
     Takes in the value map and returns a static Float value
     """
@@ -96,7 +96,7 @@ def _get_static_float(value_targets, **_value_dicts):
                 LOGGER.warning('Failed to Map Float: %s, using OR clause: %s',
                                value_targets[1],
                                new_target)
-                return _get_mapped_value(new_target, **_value_dicts)
+                return _get_mapped_value(new_target, **value_dicts)
         LOGGER.error('Error converting value: %s to float', value_targets[1])
         raise ValueError(f"Error converting value: {value_targets[1]} to float") from exc
 
