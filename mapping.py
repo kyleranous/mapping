@@ -149,7 +149,7 @@ def map_dictionary(map_dict, **value_dicts):
     """
 
     LOGGER.info('Beginning Mapping of Dictionary')
-    LOGGER.debug('Map: %s', json.dumps(map))
+    LOGGER.debug('Map: %s', json.dumps(map_dict))
     LOGGER.debug('Value Dictionaries: %s', json.dumps(value_dicts))
     # Initialize the mapped dictionary
     mapped_dict = {}
@@ -163,7 +163,7 @@ def map_dictionary(map_dict, **value_dicts):
 
         # If the value is a dictionary, pass the dictionary back to map_dictionary function
         # With the current value_dicts
-        if value.isinstance(dict):
+        if isinstance(value, dict):
             LOGGER.info('Value is a dictionary, mapping dictionary to Key: %s', key)
             mapped_dict[key] = map_dictionary(value, **value_dicts)
         # Get the mapped value for the key
