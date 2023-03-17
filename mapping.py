@@ -1,23 +1,26 @@
 """
 mapping.py is a library for Mapping values from multiple dictionaries to a single dictionary. 
 The function takes in a single map dictionary and any number of value dictionaries, it then creates
-a new dictionary with the keys from the map dictionary and the values from the mapped value categories.
+a new dictionary with the keys from the map dictionary and the values from the mapped value 
+categories.
 
-This function allows for the creation of MAP files (json) that can be swapped out without have to change
-any of the underlying code.
+This function allows for the creation of MAP files (json) that can be swapped out without have to 
+change any of the underlying code.
 
 Function allows for the use of reserved keywords to map static values or add fallback values.
 
 Keywords:
     STRING: `STRING.<value>` - Maps a static string defined in the map file to the key
     INT: `INT.<value>` - Maps a static integer defined in the map file to the key
-    FLOAT: `FLOAT.<value>` or `FLOAT.<value>.<value>` (For non-integer values) - Maps a static float defined in the map file to the key
+    FLOAT: `FLOAT.<value>` or `FLOAT.<value>.<value>` (For non-integer values) - Maps a static float 
+        defined in the map file to the key
     LIST: `LIST.<value>` - Maps a static list (Of String Values) defined in the map file to the key
     BOOL: `BOOL.true` or `BOOL.false` - Maps a static boolean defined in the map file to the key
 
     SKIP: Skips the key and doesn't add it to the output dictionary
     NULL: Adds the key to the output dictionary with a value of None
-    OR: Allows for defining a fallback value if the first Key can't be populated. OR statements can be strung together to create multiple fallbacks.
+    OR: Allows for defining a fallback value if the first Key can't be populated. OR statements can 
+        be strung together to create multiple fallbacks.
     
 """
 import json
@@ -46,6 +49,7 @@ def _get_static_string(value_targets):
             LOGGER.error(f'Error converting value: {value_targets[1]} to string')
             raise Exception(f"Error converting value: {value_targets[1]} to string")
 
+    raise Exception(f"Error converting value: {value_targets[1]} to string")
 
 def _get_static_int(value_targets, **value_dicts):
     """
@@ -66,6 +70,7 @@ def _get_static_int(value_targets, **value_dicts):
             LOGGER.error(f'Error converting value: {value_targets[1]} to integer')
             raise Exception(f"Error converting value: {value_targets[1]} to integer")
 
+    raise Exception(f"Error converting value: {value_targets[1]} to integer")
 
 def _get_static_float(value_targets, **value_dicts):
     """
@@ -112,6 +117,8 @@ def _get_static_list(value_targets, **value_dicts):
             LOGGER.error(f'Error converting value: {value_targets[1]} to list')
             raise Exception(f"Error converting value: {value_targets[1]} to list")
 
+    return []
+    
 
 def _get_static_bool(value_targets, **value_dicts):
     """
@@ -216,7 +223,7 @@ def _get_value_from_value_dict(map_address, **value_dicts):
         if len(key_groups) > 1:
             LOGGER.warning(f'Error getting value from value dictionary: {key_groups[0]} Using Value from OR: {".OR.".join(key_groups[1:])}')
             # Rejoin the rest of the key_groups and send string back to _get_mapped_value
-            return _get_mapped_value('.OR.'.join(key_groups[1:]))
+            return _get_mapped_value('.OR.'.join(key_groups[1:]), **value_dicts)
         # If no more key_groups exist, raise an exception
         LOGGER.error(f'Failed to map value from value dictionary: {map_address}')
         raise Exception(f'Error getting value from value dictionary: {map_address}')
