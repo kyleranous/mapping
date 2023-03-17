@@ -12,11 +12,11 @@ logging.getLogger().addHandler(logging.StreamHandler())
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 # Load map file
-with open(os.path.join(dir_path, 'demo_files', 'map.json')) as w:
+with open(os.path.join(dir_path, 'demo_files', 'map.json'), encoding="utf8") as w:
     map_dict = json.load(w)
 w.close()
 
-with open(os.path.join(dir_path, 'demo_files', 'values.json')) as w:
+with open(os.path.join(dir_path, 'demo_files', 'values.json'), encoding="utf8") as w:
     value_dict = json.load(w)
 w.close()
 
