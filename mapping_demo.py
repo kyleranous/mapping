@@ -1,3 +1,6 @@
+"""
+Shut up Linter
+"""
 import json
 import os
 import logging

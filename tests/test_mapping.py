@@ -1,188 +1,259 @@
 import unittest
-import json
-import os
 
 import mapping
 
 
-class TestStaticString(unittest.TestCase):
-    
-    def test_get_static_string_valid(self):
-        """
-        Test that a correctly formatted array passed to _get_static_string returns the expected result
-        """
-        self.assertEqual(mapping._get_static_string(['STRING', 'test']), "test")
-    
-    def test_get_static_string_no_value(self):
-        """
-        Test that an incorrectly formatted array passed to _get_static_string will
-        raise an exception
-        """
-
-        with self.assertRaises(Exception):
-            mapping._get_static_string(['STRING'])
-
-
-class TestStaticInteger(unittest.TestCase):
-
-    def test_get_static_int_valid(self):
-        """
-        Test that a correctly passed array will return the expected integer
-        """
-        self.assertEqual(mapping._get_static_int(['INT', '1']), 1)
-
-    def test_get_static_int_invalid(self):
-        """
-        Test that a correctly passed array with an invalid value will raise an exception
-        """
-
-        with self.assertRaises(Exception):
-            mapping._get_static_int(['INT', 'test'])
-
-    def test_get_static_int_no_value(self):
-        """
-        Test that a correctly passed array with no value will raise an exception
-        """
-
-        with self.assertRaises(Exception):
-            mapping._get_static_int(['INT'])
-
-
-class TestStaticFloat(unittest.TestCase):
-    
-    def test_get_static_float(self):
-        """
-        Test that a correctly passed array will return the expected float
-        """
-
-        self.assertEqual(mapping._get_static_float(['FLOAT', '1']), 1)
-        self.assertEqual(mapping._get_static_float(['FLOAT', '1', '1']), 1.1)
-
-    def test_get_static_float_invalid(self):
-        """
-        Test that a correctly passed array with an invalid value will raise an exception
-        """
-
-        with self.assertRaises(Exception):
-            mapping._get_static_float(['FLOAT', 'test'])
-
-        
-        self.assertEqual(mapping._get_static_float(['FLOAT', '1', 'test']), 1)
-
-
-class TestStaticList(unittest.TestCase):
-
-    def test_get_static_list_valid(self):
-        """
-        Test that a correctly passed array will return the expected list
-        """
-
-        self.assertEqual(mapping._get_static_list(['LIST', '1, 2, 3']), ['1', '2', '3'])
-
-    def test_get_static_list_single(self):
-        """
-        Test that a correctly passed array with a single string will pass an array with 
-        a length of 1
-        """
-
-        self.assertEqual(mapping._get_static_list(['LIST', '1']), ['1'])
-
-    def test_get_static_list_no_value(self):
-        """
-        Test that an array with no value will return an empty list
-        """
-
-        self.assertEqual(mapping._get_static_list(['LIST']), [])
-
-
-class TestStaticBool(unittest.TestCase):
-
-    def test_get_static_bool_valid(self):
-        """
-        Test that a correctly passed array will return the expected boolean
-        """
-
-        self.assertEqual(mapping._get_static_bool(['BOOL', 'True']), True)
-        self.assertEqual(mapping._get_static_bool(['BOOL', 'False']), False)
-
-    def test_get_static_bool_invalid(self):
-        """
-        Test that a correctly passed array with an invalid value will raise an exception
-        """
-
-        with self.assertRaises(Exception):
-            mapping._get_static_bool(['BOOL', 'test'])
-
-class TestGetMappedValue(unittest.TestCase):
-
+class TestMappingDictionary(unittest.TestCase):
+    """
+    Test mapping.mapping_dictionary for all expected functionality. 
+    """
     def setUp(self):
         """
-        Create Value Dictionary
+        Setup the value dictionary being used in each test
         """
-
         self.value_dict = {
-            'value_1': {
-                'v1_key1': 'This is a String',
-                'v1_key2': 2
+            'value1': {
+                'v1k1': 'Test String'
             }
         }
 
-    def test_get_mapped_value_valid(self):
+
+    def test_mapping_static_string(self):
         """
-        Test that a correctly formatted value is returned when provided a valid address
+        Test that passing a static string to mapping_dictionary returns the expected value
         """
-        
-        self.assertEqual(mapping._get_mapped_value('value_1.v1_key1', **self.value_dict), self.value_dict['value_1']['v1_key1'])
-        self.assertEqual(mapping._get_mapped_value('value_1.v1_key2', **self.value_dict), self.value_dict['value_1']['v1_key2'])
+        map_dict = {
+            'key1': 'STRING.Test String'
+        }
 
-    def test_get_mapped_value_invalid(self):
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+
+        self.assertEqual(result['key1'], 'Test String')
+
+    def test_mapping_static_int(self):
         """
-        Test that an exception is raised when passed an invalid address
-        Invalid address is defined as an address that does not exist in the value dictionary
+        Test that passing a static int to mapping_dictionary returns the expected value
         """
-        with self.assertRaises(Exception):
-            mapping._get_mapped_value('value_1.v1_key3', **self.value_dict)
+        map_dict = {
+            'key1': 'INT.1'
+        }
 
-    def test_get_mapped_value_invalid_with_OR(self):
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+
+        self.assertEqual(result['key1'], 1)
+
+    def test_mapping_static_float_no_decimal(self):
         """
-        Test that a STATIC value is returned when an invalid address is passed with an OR
-        and a STATIC value is provided
+        Test that passing a static float to mapping_dictionary returns the expected value
+        """
+        map_dict = {
+            'key1': 'FLOAT.1'
+        }
+
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+
+        self.assertEqual(result['key1'], 1)
+
+    def test_mapping_static_float_decimal(self):
+        """
+        Test that passing a static float to mapping_dictionary returns the expected value
+        """
+        map_dict = {
+            'key1': 'FLOAT.1.1'
+        }
+
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+
+        self.assertEqual(result['key1'], 1.1)
+
+    def test_mapping_static_list_leading_spaces(self):
+        """
+        Test that passing a static list to mapping_dictionary returns the expected value
+        """
+        map_dict = {
+            'key1': 'LIST.hello, world'
+        }
+
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+
+        self.assertEqual(result['key1'], ['hello', 'world'])
+
+    def test_mapping_static_list_trailing_spaces(self):
+        """
+        Test that passing a static list to mapping_dictionary returns the expected value
+        """
+        map_dict = {
+            'key1': 'LIST.hello ,world'
+        }
+
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+
+        self.assertEqual(result['key1'], ['hello', 'world'])
+
+    def test_mapping_static_list_leading_and_trailing_spaces(self):
+        """
+        Test that passing a static list to mapping_dictionary returns the expected value
+        """
+        map_dict = {
+            'key1': 'LIST.hello , world'
+        }
+
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+
+        self.assertEqual(result['key1'], ['hello', 'world'])
+
+    def test_mapping_static_list_no_spaces(self):
+        """
+        Test that passing a static list to mapping_dictionary returns the expected value
+        """
+        map_dict = {
+            'key1': 'LIST.hello,world'
+        }
+
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+
+        self.assertEqual(result['key1'], ['hello', 'world'])
+
+    def test_mapping_static_bool_true(self):
+        """
+        Test that passing a static bool to mapping_dictionary returns the expected value
+        """
+        map_dict = {
+            'key1': 'BOOL.true',
+            'key2': 'BOOL.True',
+            'key3': 'BOOL.TRUE'
+        }
+
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+
+        self.assertTrue(result['key1'])
+        self.assertTrue(result['key2'])
+        self.assertTrue(result['key3'])
+
+    def test_mapping_static_bool_false(self):
+        """
+        Test that passing a static bool to mapping_dictionary returns the expected value
+        """
+        map_dict = {
+            'key1': 'BOOL.false',
+            'key2': 'BOOL.False',
+            'key3': 'BOOL.FALSE'
+        }
+
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+
+        self.assertFalse(result['key1'])
+        self.assertFalse(result['key2'])
+        self.assertFalse(result['key3'])
+
+    def test_mapping_skip(self):
+        """
+        Test that passing SKIP to mapping_dictionary returns the expected value
+        """
+        map_dict = {
+            'key1': 'STRING.Should Be Here',
+            'key2': 'SKIP',
+            'key3': 'INT.1'
+        }
+
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+        expected = {
+            'key1': 'Should Be Here',
+            'key3': 1
+        }
+
+        self.assertEqual(result, expected)
+
+    def test_mapping_null(self):
+        """
+        test that passing NULL to map_dictionary returns the expected value
+        field with NULL mapped should return a field with a value of None
         """
 
-        mapped_key = 'value_1.v1_key3.OR.STRING.test'
-        self.assertEqual(mapping._get_mapped_value(mapped_key, **self.value_dict), 'test')
+        map_dict = {
+            'key1': 'NULL'
+        }
 
-    def test_get_mapped_value_invalid_with_OR_and_valid_address(self):
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+        expected = {
+            'key1': None
+        }
+
+        self.assertEqual(result, expected)
+
+    def test_mapping_or_invalid_first_condition(self):
         """
-        Test that a valid value is returned when an invalid address is passed with an OR
-        and a valid address is provided
+        Test that using OR will sucessfully process follow-on static condition if
+        first condition is invalid
         """
 
-        mapped_key = 'value_1.v1_key3.OR.value_1.v1_key1'
-        self.assertEqual(mapping._get_mapped_value(mapped_key, **self.value_dict), self.value_dict['value_1']['v1_key1'])
-        
-    def test_get_mapped_value_NULL(self):
+        map_dict = {
+            'key1': 'invalid.test.OR.STRING.Test String',
+            'key2': 'invalid.test.OR.INT.1',
+            'key3': 'invalid.test.OR.FLOAT.1.1',
+            'key4': 'invalid.test.OR.LIST.hello, world',
+            'key5': 'invalid.test.OR.BOOL.true',
+            'key6': 'invalid.test.OR.NULL',
+            'key7': 'invalid.test.OR.SKIP'
+        }
 
-        self.assertIsNone(mapping._get_mapped_value('NULL'))
+        expected_dict = {
+            'key1': 'Test String',
+            'key2': 1,
+            'key3': 1.1,
+            'key4': ['hello', 'world'],
+            'key5': True,
+            'key6': None
+        }
 
-    def test_calls_static_string(self):
+        result = mapping.map_dictionary(map_dict, **self.value_dict)
+        self.assertEqual(result, expected_dict)
 
-        self.assertEqual(mapping._get_mapped_value('STRING.test'), 'test')
+    def test_mapping_or_invalid_second_condition(self):
+        """
+        Test that using OR will raise an exception if the follow-on condition is invalid
+        """
 
-    def test_calls_static_int(self):
+        map_dict = {
+            'key1': 'invalid.test.OR.invalid.test2',
+        }
 
-        self.assertEqual(mapping._get_mapped_value('INT.1'), 1)
+        with self.assertRaises(KeyError):
+            mapping.map_dictionary(map_dict, **self.value_dict)
 
-    def test_calls_static_float(self):
-            
-            self.assertEqual(mapping._get_mapped_value('FLOAT.1'), 1)
-            self.assertEqual(mapping._get_mapped_value('FLOAT.1.1'), 1.1)
+    def test_mapping_nested_dictionary(self):
+        """
+        Test that passing a nested dictionary in a map will return the expected value
+        including statics and mapped values
+        """
 
-    def test_calls_static_list(self):
+        map_dict = {
+            'key1': {
+                's1': 'STRING.Static String',
+                's2': 'INT.1',
+                's3': 'FLOAT.1',
+                's4': 'FLOAT.1.1',
+                's5': 'LIST.hello, world',
+                's6': 'BOOL.true',
+                's7': 'NULL',
+                's8': 'SKIP',
+                's9': 'value1.v1k1',
+                's10': 'invalid.test.OR.STRING.From OR Statement'
+            }
+        }
 
-        self.assertEqual(mapping._get_mapped_value('LIST.1, 2, 3'), ['1', '2', '3'])
+        expected = {
+            'key1': {
+                's1': 'Static String',
+                's2': 1,
+                's3': 1,
+                's4': 1.1,
+                's5': ['hello', 'world'],
+                's6': True,
+                's7': None,
+                's9': 'Test String',
+                's10': 'From OR Statement' 
+            }
+        }
 
-    def test_calls_static_bool(self):
-
-        self.assertTrue(mapping._get_mapped_value('BOOL.True'))
-        self.assertFalse(mapping._get_mapped_value('BOOL.False'))
+        self.assertEqual(mapping.map_dictionary(map_dict, **self.value_dict), expected)

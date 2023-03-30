@@ -165,10 +165,16 @@ def map_dictionary(map_dict, **value_dicts):
         # With the current value_dicts
         if isinstance(value, dict):
             LOGGER.info('Value is a dictionary, mapping dictionary to Key: %s', key)
-            mapped_dict[key] = map_dictionary(value, **value_dicts)
+            result = map_dictionary(value, **value_dicts)
+            mapped_dict[key] = result
         # Get the mapped value for the key
         else:
-            mapped_dict[key] = _get_mapped_value(value, **value_dicts)
+            #Check if result was skipped as part of follow on mapping
+            result = _get_mapped_value(value, **value_dicts)
+            if result == 'SKIP':
+                LOGGER.debug('Skipping Key: %s', key)
+                continue
+            mapped_dict[key] = result
     return mapped_dict
 
 
@@ -183,6 +189,10 @@ def _get_mapped_value(map_address, **value_dicts):
     if value_keys[0] == 'NULL':
         LOGGER.debug('Value is NULL, returning None')
         return None
+    # Check for SKIP and return SKIP if found
+    if value_keys[0] == 'SKIP':
+        return 'SKIP'
+        
     # Check if the first key is a reserved keyword
     if value_keys[0] in RESERVED_KEYWORDS:
         try:

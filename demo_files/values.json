@@ -1,5 +1,15 @@
 {
     "value1": {
-        "value_test": "value_test"
+        "v1k1": "Hello World",
+        "v1k2": 2,
+        "v1k3": [1, 2, 3 ,4]
+    },
+    "value2": {
+        "v2k1": {
+            "sub1" : "This is the value",
+            "sub2": "Sub 2 Value",
+            "sub3": 100.00
+        },
+        "v2k2": "Should not be used"
     }
 }

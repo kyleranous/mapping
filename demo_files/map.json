@@ -1,4 +1,17 @@
 {
-    "test": "STRING.this is a test",
-    "test2": "value1.value_test"
+    "mapped1": "STRING.this is a test",
+    "mapped2": "value1.v1k1",
+    "mapped3": "value2.v2k1.sub1",
+    "mapped4": "value1.v1k2",
+    "mapped5": "INT.1776",
+    "mapped6": "value1.v1k3",
+    "mapped7": "NULL",
+    "mapped8": "value1.v1k4.OR.INT.0",
+    "mapped9": "LIST.Hello, world, how, are, you",
+    "mapped10": {
+        "map10_1": "value2.v2k1.sub2",
+        "map10_2": "value2.v2k1.sub3"
+    },
+    "mapped11": "SKIP",
+    "mapped12": "value2.v2k1"
 }
