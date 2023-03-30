@@ -119,17 +119,17 @@ def _get_static_list(address):
     return []
 
 
-def _get_static_bool(value_targets):
+def _get_static_bool(address):
     """
     Get Value_target and return a boolean
     """
-    LOGGER.debug('Mapping Static Boolean: %s', value_targets)
-    if value_targets[1] in ['True', 'true', 'TRUE']:
+    LOGGER.debug('Mapping Static Boolean: %s', address)
+    if address[1] in ['True', 'true', 'TRUE']:
         return True
-    if value_targets[1] in ['False', 'false', 'FALSE']:
+    if address[1] in ['False', 'false', 'FALSE']:
         return False
-    LOGGER.error('Error converting value: %s to boolean', value_targets[1])
-    raise RuntimeError(f"Error converting value: {value_targets[1]} to boolean")
+    LOGGER.error('Error converting value: %s to boolean', address[1])
+    raise RuntimeError(f"Error converting value: {address[1]} to boolean")
 
 
 # Dictionary defining reserved keywords and the function to call for each keyword
@@ -192,7 +192,7 @@ def _get_mapped_value(address, **value_dicts):
     # Check for SKIP and return SKIP if found
     if address_keys[0] == 'SKIP':
         return 'SKIP'
-        
+
     # Check if the first key is a reserved keyword
     if address_keys[0] in RESERVED_KEYWORDS:
         try:
