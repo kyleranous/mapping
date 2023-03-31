@@ -1,17 +1,27 @@
 {
-    "mapped1": "STRING.this is a test",
-    "mapped2": "value1.v1k1",
-    "mapped3": "value2.v2k1.sub1",
-    "mapped4": "value1.v1k2",
-    "mapped5": "INT.1776",
-    "mapped6": "value1.v1k3",
-    "mapped7": "NULL",
-    "mapped8": "value1.v1k4.OR.INT.0",
-    "mapped9": "LIST.Hello, world, how, are, you",
-    "mapped10": {
-        "map10_1": "value2.v2k1.sub2",
-        "map10_2": "value2.v2k1.sub3"
+    "catalog": "STRING.storefront-catalog-us",
+    "customer_id": "sample_event.customer_id",
+    "order_values": {
+        "item_total": "sample_event.price",
+        "tax": "sample_event.tax",
+        "transaction_total": "sample_event.total_capture_ammount"
     },
-    "mapped11": "SKIP",
-    "mapped12": "value2.v2k1"
+    "store_location": "transaction_data.store_id",
+    "order_type": "sample_paramstore.param5",
+    "tags": "sample_event.order_tags",
+    "channel_id": "INT.21347",
+    "notifications": "LIST.order.accepted, order.cancelled, order.shipped",
+    "transaction": {
+        "id": "transaction_data.transaction_id",
+        "employee_id": "transaction_data.employee_id"
+    },
+    "shipping_address": "sample_event.customer_address",
+    "loyalty_eligable": "BOOL.true",
+    "loyalty": {
+        "account_number": "loyalty_data.loyalty_account",
+        "balance": "loyalty_data.balance.OR.loyalty_data.point_balance",
+        "gift_card_purchase": "transaction_data.gift_card.OR.BOOL.false",
+        "customer_state": "sample_event.customer_address.state",
+        "loyalty_rep": "loyalty_data.rep_id.OR.SKIP"
+    }
 }
