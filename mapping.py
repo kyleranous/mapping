@@ -32,6 +32,8 @@ LOGGER = logging.getLogger(__name__)
 LOG_LEVEL_SET = os.environ.get('LOG_LEVEL', 'DEBUG') or 'DEBUG'
 LOG_LEVEL = logging.DEBUG if LOG_LEVEL_SET.lower() in ['debug'] else logging.INFO
 LOGGER.setLevel(LOG_LEVEL)
+file_handler = logging.FileHandler('test.log')
+LOGGER.addHandler(file_handler)
 
 
 def _get_static_string(address):
@@ -161,11 +163,21 @@ def map_dictionary(map_dict, **value_dicts):
             LOGGER.debug('Skipping Key: %s', map_key)
             continue
 
-        # If the value is a dictionary, pass the dictionary back to map_dictionary function
+        # If the value is a dictionary, pass the dictionary back to map_dictionary function``
         # With the current value_dicts
         if isinstance(address, dict):
-            LOGGER.info('Value is a dictionary, mapping dictionary to Key: %s', map_key)
-            result = map_dictionary(address, **value_dicts)
+            # check if target and map are keys in address
+            if 'target' in address and 'map' in address:
+                # check if target starts with 'MAP_ARRAY'
+                if address['target'].startswith('MAP_ARRAY'):
+                    LOGGER.info('Mapping an Array of Dictionaries')
+                    result = _map_dict_array(address, **value_dicts)
+                else:
+                    LOGGER.error('This is an error')
+            else:
+                LOGGER.info('Value is a dictionary, mapping dictionary to Key: %s', map_key)
+                result = map_dictionary(address, **value_dicts)
+
             mapped_dict[map_key] = result
         # Get the mapped value for the key
         else:
@@ -240,3 +252,22 @@ def _get_value_from_value_dict(address, **value_dicts):
         # If no more key_groups exist, raise an exception
         LOGGER.error('Failed to map value from value dictionary: %s', address)
         raise KeyError(f'Error getting value from value dictionary: {address}') from exc
+
+def _map_dict_array(address, **value_dicts):
+    """
+    Map an array of dictionaries
+    """
+    LOGGER.debug('Mapping Array of Dictionaries')
+    # Get the target and map from the address
+    target_array_address = ".".join(address['target'].split('.')[1:])
+    target_array = map_dictionary({'target_array': target_array_address}, **value_dicts)
+    result = []
+    for target in target_array['target_array']:
+        LOGGER.debug('Mapping Array Element: %s', target)
+        # Get the value for the map
+        value_dicts['TARGET'] = target
+        result.append(map_dictionary(address['map'], **value_dicts))
+        LOGGER.debug('Result: %s', result)
+        # Add the result to the target array
+
+    return result
