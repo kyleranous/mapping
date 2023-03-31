@@ -18,6 +18,23 @@
             "Clothing",
             "Expensive Clothing",
             "Some Other Random Tag"
+        ],
+        "order_items": [
+            {
+                "item_id": "item_1",
+                "item_price": 52.34,
+                "taxible": true,
+                "gift_message": "This item is a gift!"
+            },
+            {
+                "item_id": "item_2",
+                "item_price": 36.99,
+                "taxible": false
+            },
+            {
+                "item_id": "item_3",
+                "item_price": 45.66
+            }
         ]
     },
     "sample_paramstore": {

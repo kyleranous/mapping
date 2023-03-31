@@ -6,6 +6,17 @@
         "tax": "sample_event.tax",
         "transaction_total": "sample_event.total_capture_ammount"
     },
+    "order_items": {
+            "target": "MAP_ARRAY.sample_event.order_items",
+            "map": {
+                "item_number": "TARGET.item_id",
+                "catalog": "STRING.storefront-catalog-us",
+                "item_location": "sample_event.customer_id",
+                "price": "TARGET.item_price",
+                "is_taxed": "TARGET.taxible.OR.BOOL.false",
+                "gift_message": "TARGET.gift_message.OR.SKIP"
+            }
+    },
     "store_location": "transaction_data.store_id",
     "order_type": "sample_paramstore.param5",
     "tags": "sample_event.order_tags",
