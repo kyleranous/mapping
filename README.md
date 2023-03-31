@@ -3,7 +3,7 @@
 Mapping is a python library used to map Multiple dictionaries into a single output dictionary.
 
 ## Concept of Operation
-`mapping.map_dictionary` takes in (2) arguments: A Map Dictionary, and a nested dictionary of value dictionaries. It will use the keys of the Map Dictionary to create a return dictionary with the values from the value address in the value dictionaries.
+`mapping.map_dictionary` takes in (2) arguments: A Map Dictionary, and a nested dictionary of value dictionaries. It will use the keys of the Map Dictionary to create an output dictionary with the values from the value address in the value dictionaries.
 Ex:
 ```python
 import mapping
@@ -38,8 +38,7 @@ Using this function, Map files could be stored as `json` files and dynamically c
 
 
 ## Tasks
- - [ ] `MAP_ARRAY` - Need functionality to beable to create an array of dictionaries if needed.
- ex: If I need to map to an array of objects, I should define the Array with a single object that contains the mapping, the object should contain a target key that identifies which value in the value dicts to iterate through [Issue-1](https://github.com/kyleranous/mapping/issues/1)
+ - [ ] `MAP_ARRAY` - Need functionality to beable to create an array of dictionaries. See [Issue-1](https://github.com/kyleranous/mapping/issues/1). **In-Progress**
 
 
 ## Usage
@@ -136,5 +135,49 @@ print(mapping.map_dict(map_dict, **value_dict))
     'key1': {
         'id1': 'This is the nested value'
     }
+}
+```
+
+#### Mapping an Array of Dictionaries from a single map
+An array of dictionarry objects can be created if mapped to an array of `TARGET` Addresses using "MAP_ARRAY" keyword. The Map file needs to be structured as a dictionary object with "target" and "map" keywords. Any other keywords will be ignored. 
+
+```python
+ map_dict = {
+    'key1': {
+        "target": "MAP_ARRAY.dict1.value1",
+        "map": {
+            "sub_key1": "TARGET.value1_1",
+            "sub_key2": "TARGET.value1_2" 
+        }
+    }
+}
+
+value_dict = {
+    "dict1": {
+        "value1": [
+            {
+                "value1_1": "Test String 1.0",
+                "value1_2": "Test String 1.1"
+            },
+            {
+                "value1_1": "Test String 2.0",
+                "value1_2": "Test String 2.1"
+            }
+        ]
+    }
+}
+
+print(mapping.map_dict(map_dict, **value_dict))
+>>> {
+    "key1": [
+        {
+            "sub_key1": "Test String 1.0",
+            "sub_key2": "Test String 1.1"
+        },
+        {
+            "sub_key1": "Test String 2.0",
+            "sub_key2": "Test String 2.1"
+        }
+    ]
 }
 ```
