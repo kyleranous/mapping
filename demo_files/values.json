@@ -1,15 +1,41 @@
 {
-    "value1": {
-        "v1k1": "Hello World",
-        "v1k2": 2,
-        "v1k3": [1, 2, 3 ,4]
-    },
-    "value2": {
-        "v2k1": {
-            "sub1" : "This is the value",
-            "sub2": "Sub 2 Value",
-            "sub3": 100.00
+    "sample_event": {
+        "event_type": "sample.event",
+        "customer_id": "123456abcd",
+        "customer_address": {
+            "street_1": "123 Fake St",
+            "street_2": null,
+            "city": "Charleston",
+            "state": "SC",
+            "country": "US",
+            "zip_code": 91234
         },
-        "v2k2": "Should not be used"
+        "price": 134.99,
+        "tax": 18.34,
+        "total_capture_ammount": 153.33,
+        "order_tags": [
+            "Shopify",
+            "Clothing",
+            "Expensive Clothing",
+            "Some Other Random Tag"
+        ]
+    },
+    "sample_paramstore": {
+        "param1": "Cash and Carry",
+        "param2": "Endless Aisle",
+        "param3": "BOPIS",
+        "param4": "I am populating this with random industry sounding words",
+        "param5": "ecomm"
+    },
+    "transaction_data": {
+        "store_id": "US01",
+        "employee_id": "0D5YE91",
+        "transaction_id": "000001",
+        "transaction_ammount": 153.33
+    },
+    "loyalty_data": {
+        "loyalty_account": "abc123idontknow",
+        "point_balance": 1345,
+        "last_purchase_id": "123-abc-last-purchase-id"
     }
 }
