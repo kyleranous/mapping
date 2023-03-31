@@ -1,3 +1,6 @@
+"""
+mapping.py Unit Tests
+"""
 import unittest
 
 import mapping
