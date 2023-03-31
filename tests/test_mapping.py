@@ -260,3 +260,113 @@ class TestMappingDictionary(unittest.TestCase):
         }
 
         self.assertEqual(mapping.map_dictionary(map_dict, **self.value_dict), expected)
+
+    def test_mapping_arrayed_dictionaries(self):
+        """
+        Test that mapping an array of dictionaries will return an array of mapped values
+        """
+        map_dict = {
+            'key1': {
+                "target": "MAP_ARRAY.dict1.value1",
+                "map": {
+                    "sub_key1": "TARGET.value1_1",
+                    "sub_key2": "TARGET.value1_2" 
+                }
+            }
+        }
+
+        value_dict = {
+            "dict1": {
+                "value1": [
+                    {
+                        "value1_1": "Test String 1.0",
+                        "value1_2": "Test String 1.1"
+                    },
+                    {
+                        "value1_1": "Test String 2.0",
+                        "value1_2": "Test String 2.1"
+                    }
+                ]
+            }
+        }
+
+        expected = {
+            "key1": [
+                {
+                    "sub_key1": "Test String 1.0",
+                    "sub_key2": "Test String 1.1"
+                },
+                {
+                    "sub_key1": "Test String 2.0",
+                    "sub_key2": "Test String 2.1"
+                }
+            ]
+        }
+
+        self.assertEqual(mapping.map_dictionary(map_dict, **value_dict), expected)
+
+    def test_mapping_arrayed_dictionaries_with_static_values(self):
+        """
+        Test that mapping an array of dictionaries will return an array of mapped values
+        """
+        map_dict = {
+            'key1': {
+                "target": "MAP_ARRAY.dict1.value1",
+                "map": {
+                    "static1": "STRING.Static String",
+                    "static2": "INT.1",
+                    "static3": "FLOAT.1",
+                    "static4": "FLOAT.1.1",
+                    "static5": "LIST.hello, world",
+                    "static6": "BOOL.true",
+                    "static7": "NULL",
+                    "static8": "SKIP",
+                    "sub_key1": "TARGET.value1_1",
+                    "sub_key2": "TARGET.value1_2" 
+                }
+            }
+        }
+
+        value_dict = {
+            "dict1": {
+                "value1": [
+                    {
+                        "value1_1": "Test String 1.0",
+                        "value1_2": "Test String 1.1"
+                    },
+                    {
+                        "value1_1": "Test String 2.0",
+                        "value1_2": "Test String 2.1"
+                    }
+                ]
+            }
+        }
+
+        expected = {
+            "key1": [
+                {
+                    "static1": "Static String",
+                    "static2": 1,
+                    "static3": 1,
+                    "static4": 1.1,
+                    "static5": ['hello', 'world'],
+                    "static6": True,
+                    "static7": None,
+                    "sub_key1": "Test String 1.0",
+                    "sub_key2": "Test String 1.1"
+                },
+                {
+                    "static1": "Static String",
+                    "static2": 1,
+                    "static3": 1,
+                    "static4": 1.1,
+                    "static5": ['hello', 'world'],
+                    "static6": True,
+                    "static7": None,
+                    "sub_key1": "Test String 2.0",
+                    "sub_key2": "Test String 2.1"
+                }
+            ]
+        }
+
+        self.assertEqual(mapping.map_dictionary(map_dict, **value_dict), expected)
