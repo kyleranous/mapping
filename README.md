@@ -139,7 +139,7 @@ print(mapping.map_dict(map_dict, **value_dict))
 ```
 
 #### Mapping an Array of Dictionaries from a single map
-An array of dictionarry objects can be created if mapped to an array of `TARGET` Addresses using "MAP_ARRAY" keyword. The Map file needs to be structured as a dictionary object with "target" and "map" keywords. Any other keywords will be ignored. 
+An array of dictionarry objects can be created if mapped to an array of `TARGET` Addresses using `MAP_ARRAY` keyword. The Map file needs to be structured as a dictionary object with `target` and `map` keywords. Any other keywords will be ignored. See the example below.
 
 ```python
  map_dict = {
